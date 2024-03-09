@@ -12,7 +12,19 @@ const errorHandler = (err, req, res, next) => {
   res.json(errors);
 };
 
+const setCommonError = (res, error) => {
+  return res.status(error.status).json({
+    errors: {
+      common: {
+        msg: error.message,
+      },
+    },
+  });
+};
+
+
 module.exports = {
   notFoundHandler,
   errorHandler,
+  setCommonError
 };
