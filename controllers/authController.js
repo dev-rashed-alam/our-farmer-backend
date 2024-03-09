@@ -5,10 +5,20 @@ const User = require("../models/User")
 const doUserRegistration = async (req, res, next) => {
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
-        const newUser = new User({
-            ...req.body,
-            password: hashedPassword,
-        });
+        let newUser;
+        if (req.files && req.files.length > 0) {
+            const avatarLocation = process.env.APP_URL + "uploads/avatars/";
+            newUser = new User({
+                ...req.body,
+                avatar: avatarLocation + req.files[0].filename,
+                password: hashedPassword,
+            });
+        } else {
+            newUser = new User({
+                ...req.body,
+                password: hashedPassword,
+            });
+        }
         await newUser.save();
         res.status(200).json({
             message: "Registration successful!"
