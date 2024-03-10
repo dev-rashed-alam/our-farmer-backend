@@ -31,6 +31,11 @@ const userSchema = mongoose.Schema({
         type: String,
         enum: ["ADMIN", "SUPERVISOR", "FARMER"],
         default: "FARMER"
+    },
+    status: {
+        type: String,
+        enum: ["PENDING", "APPROVED", "HOLD", "REJECTED"],
+        default: "PENDING"
     }
 }, {timestamps: true});
 

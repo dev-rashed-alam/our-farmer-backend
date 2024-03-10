@@ -30,8 +30,13 @@ const doUserRegistration = async (req, res, next) => {
 
 const doUserLogin = async (req, res, next) => {
     try {
-        const user = await User.findOne({email: req.body.email})
-        if (user._id) {
+        let user;
+        if (req.body.userType === "FARMER") {
+            user = await User.findOne({phoneNumber: req.body.phoneNumber})
+        } else {
+            user = await User.findOne({email: req.body.email})
+        }
+        if (user?._id) {
             const isValidPassword = await bcrypt.compare(req.body.password, user.password);
             if (isValidPassword) {
                 const userObj = {
