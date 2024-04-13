@@ -1,42 +1,42 @@
 const mongoose = require("mongoose");
 
-const productSubCatalog = mongoose.Schema({
+const productCategory = mongoose.Schema({
     name: {
         type: String,
         required: true,
         trim: true,
         unique: true
-    },
-    createdBy: {
-        type: mongoose.Types.ObjectId,
-        ref: "User"
-    },
-    updatedBy: {
-        type: mongoose.Types.ObjectId,
-        ref: "User"
     }
 }, {timestamps: true})
 
 const productCatalog = mongoose.Schema({
-    name: {
+    productTitle: {
         type: String,
         required: true,
         trim: true,
         unique: true
     },
-    subCatalog: [productSubCatalog],
-    createdBy: {
+    areaInfo: {type: mongoose.Types.ObjectId, ref: "Area_Info"},
+    productCategory: [{
         type: mongoose.Types.ObjectId,
-        ref: "User"
-    },
-    updatedBy: {
-        type: mongoose.Types.ObjectId,
-        ref: "User"
-    }
+        ref: "Product_Category"
+    }],
+    farmingStartDate: {type: Date, required: true},
+    farmingEndDate: {type: Date, required: true},
+    unitType: {type: String, required: true},
+    totalProduction: {type: String, required: true},
+    totalCost: {type: String, required: true},
+    moq: {type: String, required: true},
+    unitCost: {type: String, required: true},
+    description: {type: String, required: true},
+    // createdBy: {
+    //     type: mongoose.Types.ObjectId,
+    //     ref: "User"
+    // }
 }, {timestamps: true})
 
 const ProductCatalog = mongoose.model("Product_Catalog", productCatalog);
 
-const ProductSubCatalog = mongoose.model("Product_Sub_Catalog", productSubCatalog);
+const ProductCategory = mongoose.model("Product_Category", productCategory);
 
-module.exports = {ProductCatalog, ProductSubCatalog}
+module.exports = {ProductCatalog, ProductCategory}

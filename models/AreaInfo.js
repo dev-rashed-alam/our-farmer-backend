@@ -1,20 +1,15 @@
 const mongoose = require("mongoose")
 
-const mouzaInfo = mongoose.Schema({name: {type: String, trim: true, unique: true, required: true}})
-
-const subDistrictInfo = mongoose.Schema({
-    name: {type: String, trim: true, unique: true, required: true},
-    mouza: [mouzaInfo]
-})
-
-const districtInfo = mongoose.Schema({
-    name: {type: String, trim: true, unique: true, required: true},
-    subDistrict: [subDistrictInfo]
-})
-
 const areaInfo = mongoose.Schema({
-    name: {type: String, trim: true, unique: true, required: true},
-    district: [districtInfo]
+    divisionId: {type: Number, required: true},
+    divisionName: {type: String, required: true},
+    districtId: {type: Number, required: true},
+    districtName: {type: String, required: true},
+    subDistrictId: {type: Number, required: true},
+    subDistrictName: {type: String, required: true},
+    mouzaId: {type: Number, required: true},
+    mouzaName: {type: String, required: true},
+    description: {type: String, trim: true}
 }, {timeStamps: true})
 
 const AreaInfo = mongoose.model("Area_Info", areaInfo);

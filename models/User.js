@@ -29,7 +29,7 @@ const userSchema = mongoose.Schema({
     },
     userType: {
         type: String,
-        enum: ["ADMIN", "SUPERVISOR", "FARMER"],
+        enum: ["ADMIN", "SUPERVISOR", "FARMER", "CONSUMER"],
         default: "FARMER"
     },
     status: {
