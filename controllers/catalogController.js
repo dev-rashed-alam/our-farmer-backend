@@ -5,7 +5,8 @@ const {productStages, parseDate} = require("../utilities/helper");
 
 const saveAreaInfo = async (req) => {
     const area = new AreaInfo({
-        ...req.body
+        ...req.body,
+        status: "LAND_INFO_ADDED"
     })
     await area.save();
     return area;

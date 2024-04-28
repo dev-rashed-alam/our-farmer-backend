@@ -23,16 +23,12 @@ const productCatalog = mongoose.Schema({
     }],
     farmingStartDate: {type: Date, required: true},
     farmingEndDate: {type: Date, required: true},
-    unitType: {type: String, required: true},
+    unitType: {type: Object, required: true},
     totalProduction: {type: String, required: true},
     totalCost: {type: String, required: true},
     moq: {type: String, required: true},
     unitCost: {type: String, required: true},
     description: {type: String, required: true},
-    // createdBy: {
-    //     type: mongoose.Types.ObjectId,
-    //     ref: "User"
-    // }
 }, {timestamps: true})
 
 const ProductCatalog = mongoose.model("Product_Catalog", productCatalog);
