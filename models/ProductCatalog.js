@@ -17,6 +17,7 @@ const productCatalog = mongoose.Schema({
         unique: true
     },
     areaInfo: {type: mongoose.Types.ObjectId, ref: "Area_Info"},
+    superVisor: {type: mongoose.Types.ObjectId, ref: "User"},
     productCategory: [{
         type: mongoose.Types.ObjectId,
         ref: "Product_Category"
@@ -29,6 +30,12 @@ const productCatalog = mongoose.Schema({
     moq: {type: String, required: true},
     unitCost: {type: String, required: true},
     description: {type: String, required: true},
+    stage: {type: String, required: true},
+    status: {
+        type: String,
+        enum: ["PENDING", "APPROVED", "HOLD", "REJECTED"],
+        default: "PENDING"
+    }
 }, {timestamps: true})
 
 const ProductCatalog = mongoose.model("Product_Catalog", productCatalog);

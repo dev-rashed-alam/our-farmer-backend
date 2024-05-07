@@ -11,7 +11,7 @@ const areaInfo = mongoose.Schema({
     landAcquisitionType: {type: Object, required: true},
     legalAffairs: {type: Object, required: true},
     description: {type: String, trim: true},
-    status: {type: String, trim: true}
+    stage: {type: String, trim: true}
 }, {timeStamps: true})
 
 const AreaInfo = mongoose.model("Area_Info", areaInfo);
