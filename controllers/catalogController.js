@@ -40,7 +40,9 @@ const saveProductInfo = async (req) => {
         stage: "PRODUCT_INFO_ADDED"
     })
     await productCatalog.save();
-    return productCatalog;
+    const populatedProduct = await ProductCatalog.findById(productCatalog.id).populate('superVisor');
+    return populatedProduct;
+
 }
 
 const updateProductInfo = async (req) => {
