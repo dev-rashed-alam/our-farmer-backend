@@ -145,11 +145,39 @@ const getAllCategories = async (req, res, next) => {
     }
 }
 
+const changeProductStatus = async (req, res, next) => {
+    try {
+        await ProductCatalog.findOneAndUpdate({_id: req.params.id}, {$set: {status: req.params.status}}).populate("superVisor");
+        const productCatalog = await ProductCatalog.findOne({_id: req.params.id}).populate("superVisor")
+        res.status(200).json({
+            message: "Successful!",
+            data: productCatalog
+        })
+    } catch (error) {
+        console.log(error)
+        setCommonError(error)
+    }
+}
+
+const removeCatalog = async (req, res, next) => {
+    try {
+        await ProductCatalog.findOneAndDelete({_id: req.params.id})
+        res.status(200).json({
+            message: "successful",
+        });
+    } catch (error) {
+        console.log(error)
+        setCommonError(error)
+    }
+}
+
 module.exports = {
     saveCatalog,
     saveProductCategory,
     getAllCatalog,
     getAllCategories,
     getCatalogById,
-    updateCatalog
+    updateCatalog,
+    changeProductStatus,
+    removeCatalog
 }
