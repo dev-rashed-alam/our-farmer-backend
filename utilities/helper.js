@@ -14,7 +14,18 @@ const parseDate = (dateStr) => {
     return null; // Return null if parsing fails
 }
 
+const removeEmptyValues = (obj) => {
+    Object.keys(obj).forEach((key) => {
+        if (obj[key] === null || obj[key] === undefined || obj[key] === "") {
+            delete obj[key];
+        }
+    });
+    return obj;
+};
+
+
 module.exports = {
     productStages,
-    parseDate
+    parseDate,
+    removeEmptyValues
 }

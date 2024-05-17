@@ -15,11 +15,11 @@ const addLoginValidators = [
 
 const validateConfirmPassword = [
     check("confirmPassword")
-        .if(check("password"))
+        .if(check("password").notEmpty())
         .trim()
-        .notEmpty()
+        .isLength({ min: 3 })
         .withMessage("Confirm Password is required!")
-        .custom(async (confirmPassword, {req}) => {
+        .custom(async (confirmPassword, { req }) => {
             const password = req.body.password;
             if (password !== confirmPassword) {
                 throw new Error("Passwords must be same");
