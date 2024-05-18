@@ -18,6 +18,7 @@ const productCatalog = mongoose.Schema({
     },
     areaInfo: {type: mongoose.Types.ObjectId, ref: "Area_Info"},
     superVisor: {type: mongoose.Types.ObjectId, ref: "User"},
+    createdBy: {type: mongoose.Types.ObjectId, ref: "User"},
     productCategory: [{
         type: mongoose.Types.ObjectId,
         ref: "Product_Category"

@@ -54,7 +54,7 @@ const updateUserStatusById = async (req, res, next) => {
 const updateUserById = async (req, res, next) => {
     try {
         const postData = removeEmptyValues(req.body);
-        if (req.files?.[0]?.filename) {
+        if (req?.files?.[0]?.filename) {
             const avatarLocation = process.env.APP_URL + "uploads/avatars/";
             postData.avatar = avatarLocation + req.files[0].filename;
         }
@@ -66,7 +66,7 @@ const updateUserById = async (req, res, next) => {
             {_id: req.params.id},
             {$set: postData}
         );
-        if (req.files[0]?.filename) {
+        if (req?.files?.[0]?.filename) {
             removeUploadedFile(user.avatar, "avatars");
         }
         const updatedUser = await User.findOne(

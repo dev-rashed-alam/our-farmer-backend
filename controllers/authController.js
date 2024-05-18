@@ -40,7 +40,8 @@ const doUserLogin = async (req, res, next) => {
                     userType: user.userType,
                     firstName: user.firstName,
                     lastName: user.lastName,
-                    phoneNumber: user.phoneNumber
+                    phoneNumber: user.phoneNumber,
+                    avatar: user.avatar
                 }
                 const token = jwt.sign(userObj, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRY})
                 res.status(200).json({

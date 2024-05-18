@@ -37,7 +37,8 @@ const saveProductInfo = async (req) => {
         superVisor: superVisor[0],
         farmingStartDate: parseDate(req.body.farmingStartDate),
         farmingEndDate: parseDate(req.body.farmingEndDate),
-        stage: "PRODUCT_INFO_ADDED"
+        stage: "PRODUCT_INFO_ADDED",
+        createdBy: req.loggedInUser.id
     })
     await productCatalog.save();
     const populatedProduct = await ProductCatalog.findById(productCatalog.id).populate('superVisor');
@@ -119,6 +120,19 @@ const getAllCatalog = async (req, res, next) => {
     }
 }
 
+const getAllCatalogByUser = async (req, res, next) => {
+    try {
+        const data = await ProductCatalog.find({createdBy: req.loggedInUser.id}).populate("productCategory", "name").populate("superVisor");
+        res.status(200).json({
+            message: "Successful!",
+            data
+        })
+    } catch (error) {
+        console.log(error)
+        setCommonError(error)
+    }
+}
+
 const getCatalogById = async (req, res, next) => {
     try {
         const data = await ProductCatalog.findOne({"_id": req.params.id}).populate("areaInfo superVisor productCategory");
@@ -179,5 +193,6 @@ module.exports = {
     getCatalogById,
     updateCatalog,
     changeProductStatus,
-    removeCatalog
+    removeCatalog,
+    getAllCatalogByUser
 }
