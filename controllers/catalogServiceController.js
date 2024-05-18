@@ -90,6 +90,24 @@ const getCatalogServiceById = async (req, res, next) => {
     }
 }
 
+const getCatalogServiceByStatus = async (req, res, next) => {
+    try {
+        const data = await CatalogService.find({status: req.params.status}).populate({
+            path: 'productCatalog',
+            populate: {
+                path: 'productCategory'
+            }
+        }).populate("createdBy");
+        res.status(200).json({
+            message: "Successful!",
+            data
+        })
+    } catch (error) {
+        console.log(error)
+        setCommonError(error)
+    }
+}
+
 const changeCatalogServiceStatus = async (req, res, next) => {
     try {
         await CatalogService.findOneAndUpdate({_id: req.params.id}, {$set: {status: req.params.status}});
@@ -123,5 +141,6 @@ module.exports = {
     getAllCatalogServiceByUser,
     getAllCatalogService,
     updateCatalogService,
-    saveCatalogService
+    saveCatalogService,
+    getCatalogServiceByStatus
 }
