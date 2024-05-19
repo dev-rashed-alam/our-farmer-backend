@@ -60,8 +60,45 @@ const createOrder = async (req, res, next) => {
     }
 }
 
+const updateOrderStatus = async (req, res, next) => {
+    try {
+        const data = await Order.findByIdAndUpdate(req.params.id,
+            {
+                isDelivered: "DELIVERED",
+                deliveredAt: Date.now(),
+                isPaid: true,
+                paidAt: Date.now()
+            },
+            {
+                new: true
+            });
+        res.status(200).json({
+            message: "Update successful!",
+            data
+        })
+    } catch (error) {
+        setCommonError(error)
+    }
+}
+
+const getSingleOrder = async (req, res, next) => {
+    try {
+        const data = await Order.findById(req.params.id);
+        res.status(200).json({
+            message: "Successful!",
+            data
+        })
+    }
+    catch (error) {
+        setCommonError(error)
+    }
+}
+
 
 module.exports = {
     getOrders,
-    createOrder
+    createOrder,
+    updateOrderStatus,
+    getSingleOrder
+
 }

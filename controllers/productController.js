@@ -13,10 +13,6 @@ const getAllProducts = async (req, res, next) => {
     }
 }
 
-module.exports = {
-    getAllProducts,
-}
-
 const createProduct = async (req, res, next) => {
     try {
         const product = new Product({...req.body})
@@ -56,6 +52,7 @@ const updateProduct = async (req, res, next) => {
 }
 
 module.exports = {
+    getAllProducts,
     createProduct,
     updateProduct
 }
