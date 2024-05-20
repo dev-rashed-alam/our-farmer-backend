@@ -5,11 +5,11 @@ const authMiddleware = (req, res, next) => {
     const { authorization } = req.headers;
     const token = authorization.split(" ")[1];
     const jwtPayload = jwt.verify(token, process.env.JWT_SECRET);
-    const { email, id, role } = jwtPayload;
+    const { email, id, userType } = jwtPayload;
     req.loggedInUser = {
       email,
       id,
-      role,
+      userType,
     };
     next();
   } catch {

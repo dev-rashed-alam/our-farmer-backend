@@ -1,6 +1,5 @@
 const {setCommonError} = require("../middlewares/common/errorHandler");
-const {ProductPhase, PhaseActivity} = require("../models/ProductTNA");
-const {parseDate} = require("../utilities/helper");
+const {ProductPhase, PhaseActivity, ProductTna} = require("../models/ProductTNA");
 
 
 const saveTnaMasterData = async (req, res, next) => {
@@ -29,4 +28,62 @@ const saveTnaMasterData = async (req, res, next) => {
     }
 }
 
-module.exports = {saveTnaMasterData}
+const getTnaMasterData = async (req, res, next) => {
+    try {
+        const activityList = await PhaseActivity.find().populate("Product_Phase");
+        res.status(200).json({
+            message: "Save successful!",
+            data: activityList
+        })
+    } catch (error) {
+        console.log(error)
+        setCommonError(error)
+    }
+}
+
+const saveProductTna = async (req, res, next) => {
+    try {
+        const productTna = new ProductTna({
+            serviceInfo: req.body.serviceId,
+            activity: req.body.activity,
+            requestedUser: req.body.requestedUser,
+            createdBy: req.loggedInUser.id
+        })
+        await productTna.save();
+        res.status(200).json({
+            message: "Save successful!",
+            data: productTna
+        })
+    } catch (error) {
+        console.log(error)
+        setCommonError(error)
+    }
+}
+
+const getProductTnaByUser = async (req, res, next) => {
+    try {
+        const productTna = ProductTna.findOne({requestedUser: req.params.userId});
+        res.status(200).json({
+            message: "Save successful!",
+            data: productTna
+        })
+    } catch (error) {
+        console.log(error)
+        setCommonError(error)
+    }
+}
+
+const getProductTnaById = async (req, res, next) => {
+    try {
+        const productTna = ProductTna.findOne({_id: req.params.id});
+        res.status(200).json({
+            message: "Save successful!",
+            data: productTna
+        })
+    } catch (error) {
+        console.log(error)
+        setCommonError(error)
+    }
+}
+
+module.exports = {saveTnaMasterData, getTnaMasterData, saveProductTna, getProductTnaById, getProductTnaByUser}
