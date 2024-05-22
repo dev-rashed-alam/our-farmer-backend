@@ -25,7 +25,7 @@ const router = express.Router();
 router.get("/catalogs", authMiddleware, getAllCatalog)
 router.get("/catalogs/by-user", authMiddleware, getAllCatalogByUser)
 router.get("/catalog/:id", authMiddleware, getCatalogById)
-router.get("/categories", authMiddleware, getAllCategories)
+router.get("/categories", getAllCategories)
 router.post("/catalog/save/:stage", authMiddleware, saveCatalog)
 router.post("/category/save", authMiddleware, saveProductCategory)
 router.put("/catalog/update/:stage/:id", authMiddleware, updateCatalog)
