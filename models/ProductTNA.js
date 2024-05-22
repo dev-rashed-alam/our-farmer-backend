@@ -15,6 +15,7 @@ const phaseSchema = new mongoose.Schema({
 const productTna = mongoose.Schema({
     serviceInfo: {type: mongoose.Types.ObjectId, ref: "Catalog_Service"},
     createdBy: {type: mongoose.Types.ObjectId, ref: "User"},
+    requestedUser: {type: mongoose.Types.ObjectId, ref: "User"},
     activity: [{
         task: {type: mongoose.Types.ObjectId, ref: "Phase_Activity"},
         startDate: {type: Date},
