@@ -20,7 +20,11 @@ const {
     changeCatalogServiceStatus,
     removeCatalogService, getCatalogServiceByStatus
 } = require("../controllers/catalogServiceController");
+const {getProductTnaById, getProductTnaByUser} = require("../controllers/tnaController");
 const router = express.Router();
+
+router.get("/tna/by-user", authMiddleware, getProductTnaByUser)
+router.get("/tna/:id", authMiddleware, getProductTnaById)
 
 router.get("/catalogs", authMiddleware, getAllCatalog)
 router.get("/catalogs/by-user", authMiddleware, getAllCatalogByUser)
@@ -40,6 +44,5 @@ router.post("/service/save", authMiddleware, saveCatalogService)
 router.put("/service/update/:id", authMiddleware, updateCatalogService)
 router.put("/service/change/status/:id/:status", authMiddleware, changeCatalogServiceStatus)
 router.delete("/service/remove/:id", authMiddleware, removeCatalogService)
-
 
 module.exports = router

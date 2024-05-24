@@ -43,16 +43,19 @@ const getTnaMasterData = async (req, res, next) => {
 
 const saveProductTna = async (req, res, next) => {
     try {
-        const productTna = new ProductTna({
-            serviceInfo: req.body.serviceId,
-            activity: req.body.activity,
-            requestedUser: req.body.requestedUser,
-            createdBy: req.loggedInUser.id
-        })
-        await productTna.save();
+        const isTnaExist = ProductTna.findOne({serviceInfo: req.body.serviceId})
+        if (!isTnaExist._id) {
+            const activityList = await PhaseActivity.find();
+            const productTna = new ProductTna({
+                serviceInfo: req.body.serviceId,
+                activity: activityList.map(item => item._id),
+                requestedUser: req.body.requestedUser,
+                createdBy: req.loggedInUser.id
+            })
+            await productTna.save();
+        }
         res.status(200).json({
-            message: "Save successful!",
-            data: productTna
+            message: "Save successful!"
         })
     } catch (error) {
         console.log(error)
@@ -62,7 +65,12 @@ const saveProductTna = async (req, res, next) => {
 
 const getProductTnaByUser = async (req, res, next) => {
     try {
-        const productTna = ProductTna.findOne({requestedUser: req.params.userId});
+        const productTna = await ProductTna.find({requestedUser: req.loggedInUser.id}).populate({
+            path: 'serviceInfo',
+            populate: {
+                path: 'productCatalog'
+            }
+        });
         res.status(200).json({
             message: "Save successful!",
             data: productTna
@@ -75,7 +83,16 @@ const getProductTnaByUser = async (req, res, next) => {
 
 const getProductTnaById = async (req, res, next) => {
     try {
-        const productTna = ProductTna.findOne({_id: req.params.id});
+        const productTna = await ProductTna.findOne({ _id: req.params.id })
+            .populate('serviceInfo')
+            .populate('createdBy')
+            .populate('requestedUser')
+            .populate({
+                path: "activity",
+                populate: {
+                    path: "phase"
+                }
+            })
         res.status(200).json({
             message: "Save successful!",
             data: productTna
