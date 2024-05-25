@@ -1,6 +1,7 @@
 const {setCommonError} = require("../middlewares/common/errorHandler");
 const CatalogService = require("../models/CatalogService");
 const {parseDate} = require("../utilities/helper");
+const {saveNotification} = require("./notificationController");
 
 const saveServiceInfo = async (req) => {
     const newService = new CatalogService({
@@ -10,7 +11,19 @@ const saveServiceInfo = async (req) => {
         createdBy: req.loggedInUser.id
     })
     await newService.save();
-    return CatalogService.findById(newService.id).populate('productCatalog').populate('createdBy');
+    const catalogService = await CatalogService.findById(newService.id).populate('productCatalog').populate('createdBy');
+    await saveNotification({
+        userId: catalogService.createdBy,
+        loggedInUser: req.loggedInUser,
+        userType: "ADMIN",
+        data: {
+            entity: "SERVICE",
+            title: `A new service of ${catalogService.serviceType.label} for ${catalogService.productCatalog.productTitle} is added`,
+            createdAt: catalogService.createdAt,
+            entityId: catalogService._id
+        }
+    })
+    return catalogService;
 }
 
 const updateServiceInfo = async (req) => {
@@ -124,7 +137,19 @@ const changeCatalogServiceStatus = async (req, res, next) => {
 
 const removeCatalogService = async (req, res, next) => {
     try {
-        await CatalogService.findOneAndDelete({_id: req.params.id})
+        const catalogService = await CatalogService.findOneAndDelete({_id: req.params.id}).populate('productCatalog')
+
+        await saveNotification({
+            userId: catalogService.createdBy,
+            loggedInUser: req.loggedInUser,
+            userType: "FARMER",
+            data: {
+                entity: "SERVICE",
+                title: `Your Service of ${catalogService.serviceType.label} for ${catalogService.productCatalog.productTitle} is deleted`,
+                createdAt: catalogService.createdAt,
+                entityId: catalogService._id
+            }
+        })
         res.status(200).json({
             message: "successful",
         });
