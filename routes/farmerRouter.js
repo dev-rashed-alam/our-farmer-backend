@@ -20,11 +20,12 @@ const {
     changeCatalogServiceStatus,
     removeCatalogService, getCatalogServiceByStatus
 } = require("../controllers/catalogServiceController");
-const {getProductTnaById, getProductTnaByUser} = require("../controllers/tnaController");
+const {getProductTnaById, getProductTnaByUser, updateProductTna} = require("../controllers/tnaController");
 const router = express.Router();
 
 router.get("/tna/by-user", authMiddleware, getProductTnaByUser)
 router.get("/tna/:id", authMiddleware, getProductTnaById)
+router.put("/tna/:id", authMiddleware, updateProductTna)
 
 router.get("/catalogs", authMiddleware, getAllCatalog)
 router.get("/catalogs/by-user", authMiddleware, getAllCatalogByUser)

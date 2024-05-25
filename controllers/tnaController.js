@@ -65,7 +65,8 @@ const saveProductTna = async (req, res, next) => {
 
 const getProductTnaByUser = async (req, res, next) => {
     try {
-        const productTna = await ProductTna.find({requestedUser: req.loggedInUser.id}).populate({
+        let filterQuery = req.loggedInUser.userType === "FARMER" ? {requestedUser: req.loggedInUser.id} : {}
+        const productTna = await ProductTna.find(filterQuery).populate({
             path: 'serviceInfo',
             populate: {
                 path: 'productCatalog'
@@ -83,7 +84,7 @@ const getProductTnaByUser = async (req, res, next) => {
 
 const getProductTnaById = async (req, res, next) => {
     try {
-        const productTna = await ProductTna.findOne({ _id: req.params.id })
+        const productTna = await ProductTna.findOne({_id: req.params.id})
             .populate('serviceInfo')
             .populate('createdBy')
             .populate('requestedUser')
@@ -103,4 +104,23 @@ const getProductTnaById = async (req, res, next) => {
     }
 }
 
-module.exports = {saveTnaMasterData, getTnaMasterData, saveProductTna, getProductTnaById, getProductTnaByUser}
+const updateProductTna = async (req, res, next) => {
+    try {
+        const productTna = await ProductTna.findOneAndUpdate({_id: req.params.id}, {$set: req.body});
+        res.status(200).json({
+            message: "Save successful!",
+            data: productTna
+        })
+    } catch (error) {
+        setCommonError(error)
+    }
+}
+
+module.exports = {
+    saveTnaMasterData,
+    getTnaMasterData,
+    saveProductTna,
+    getProductTnaById,
+    getProductTnaByUser,
+    updateProductTna
+}

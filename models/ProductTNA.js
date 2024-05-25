@@ -21,6 +21,7 @@ const productTna = mongoose.Schema({
         activityId: {type: mongoose.Types.ObjectId, required: true},
         startDate: {type: Date},
         endDate: {type: Date},
+        remarks: {type: String},
     }]
 }, {timestamps: true})
 
