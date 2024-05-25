@@ -4,11 +4,14 @@ const Notification = require("../models/Notification")
 const saveNotification = async (req) => {
     try {
         const notification = new Notification({
-            ...req.body,
+            ...req,
+            read: false,
             createdBy: req.loggedInUser.id
         })
         await notification.save();
     } catch (error) {
+        console.log(error)
+
         setCommonError(error)
     }
 }
@@ -19,7 +22,7 @@ const getAllNotification = async (req, res, next) => {
         if (req.loggedInUser.userType === "ADMIN") {
             notifications = await Notification.find({userType: "ADMIN"})
         } else {
-            notifications = await Notification.find({userId: req.loggedInUser.id})
+            notifications = await Notification.find({userId: req.loggedInUser.id, userType: "FARMER"})
         }
         res.status(200).json({
             message: "Successful!",

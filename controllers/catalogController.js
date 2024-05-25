@@ -4,6 +4,7 @@ const {ProductCatalog, ProductCategory} = require("../models/ProductCatalog");
 const {productStages, parseDate} = require("../utilities/helper");
 const createError = require("http-errors");
 const User = require("../models/User")
+const {saveNotification} = require("./notificationController");
 
 const saveAreaInfo = async (req) => {
     const area = new AreaInfo({
@@ -77,6 +78,16 @@ const saveCatalog = async (req, res, next) => {
         }
         if (stage === productStages.PRODUCT_INFO) {
             data = await saveProductInfo(req);
+            await saveNotification({
+                loggedInUser: req.loggedInUser,
+                userType: "ADMIN",
+                data: {
+                    entity: "CATALOG",
+                    title: `New Catalog ${data.productTitle} is added`,
+                    createdAt: data.createdAt,
+                    entityId: data._id
+                }
+            })
         }
         res.status(200).json({
             message: "Save successful!",
@@ -163,6 +174,19 @@ const changeProductStatus = async (req, res, next) => {
     try {
         await ProductCatalog.findOneAndUpdate({_id: req.params.id}, {$set: {status: req.params.status}}).populate("superVisor");
         const productCatalog = await ProductCatalog.findOne({_id: req.params.id}).populate("superVisor")
+
+        await saveNotification({
+            userId: productCatalog.createdBy,
+            loggedInUser: req.loggedInUser,
+            userType: "FARMER",
+            data: {
+                entity: "CATALOG",
+                title: `Your Catalog ${productCatalog.productTitle} is ${productCatalog.status === "APPROVE" ? "Approved" : "Rejected"}`,
+                createdAt: productCatalog.createdAt,
+                entityId: productCatalog._id
+            }
+        })
+
         res.status(200).json({
             message: "Successful!",
             data: productCatalog
@@ -175,7 +199,19 @@ const changeProductStatus = async (req, res, next) => {
 
 const removeCatalog = async (req, res, next) => {
     try {
-        await ProductCatalog.findOneAndDelete({_id: req.params.id})
+        const productCatalog = await ProductCatalog.findOneAndDelete({_id: req.params.id})
+        await saveNotification({
+            userId: productCatalog.createdBy,
+            loggedInUser: req.loggedInUser,
+            userType: "FARMER",
+            data: {
+                entity: "CATALOG",
+                title: `Your Catalog ${productCatalog.productTitle} is deleted`,
+                createdAt: productCatalog.createdAt,
+                entityId: null
+            }
+        })
+
         res.status(200).json({
             message: "successful",
         });
