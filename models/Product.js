@@ -8,7 +8,7 @@ const productSchema = mongoose.Schema({
     },
     nameBn: {
         type: String,
-        required: true,
+        required: false,
         trim: true
     },
     slug: {
@@ -23,7 +23,7 @@ const productSchema = mongoose.Schema({
     },
     descriptionBn: {
         type: String,
-        required: true,
+        required: false,
         trim: true,
     },
     stock: {
@@ -58,6 +58,11 @@ const productSchema = mongoose.Schema({
     isTrending: {
         type: Boolean,
         default: false
+    },
+    sku: {
+        type: String,
+        required: false,
+        default: ""
     },
     category: {
         type: mongoose.Types.ObjectId,
