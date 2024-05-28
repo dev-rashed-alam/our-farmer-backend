@@ -11,7 +11,6 @@ const saveNotification = async (req) => {
         await notification.save();
     } catch (error) {
         console.log(error)
-
         setCommonError(error)
     }
 }
@@ -20,9 +19,15 @@ const getAllNotification = async (req, res, next) => {
     try {
         let notifications = [];
         if (req.loggedInUser.userType === "ADMIN") {
-            notifications = await Notification.find({userType: "ADMIN"})
+            notifications = await Notification.find({userType: "ADMIN", read: false}).sort({_id: -1})
         } else {
-            notifications = await Notification.find({userId: req.loggedInUser.id, userType: "FARMER"})
+            notifications = await Notification.find({
+                userId: req.loggedInUser.id,
+                userType: "FARMER",
+                read: false
+            }).sort({
+                _id: -1
+            })
         }
         res.status(200).json({
             message: "Successful!",
@@ -45,9 +50,18 @@ const changeNotificationStatus = async (req, res, next) => {
     }
 }
 
+const deleteNotifications = async (entityId, entityType) => {
+    try {
+        await Notification.deleteMany({"data.entity": entityType, "data.entityId": entityId})
+    } catch (error) {
+        setCommonError(error)
+    }
+}
+
 
 module.exports = {
     saveNotification,
     getAllNotification,
-    changeNotificationStatus
+    changeNotificationStatus,
+    deleteNotifications
 }

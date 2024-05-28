@@ -1,5 +1,6 @@
 const {setCommonError} = require("../middlewares/common/errorHandler");
 const {ProductPhase, PhaseActivity, ProductTna} = require("../models/ProductTNA");
+const {saveNotification} = require("./notificationController");
 
 
 const saveTnaMasterData = async (req, res, next) => {
@@ -106,7 +107,19 @@ const getProductTnaById = async (req, res, next) => {
 
 const updateProductTna = async (req, res, next) => {
     try {
-        const productTna = await ProductTna.findOneAndUpdate({_id: req.params.id}, {$set: req.body});
+        const productTna = await ProductTna.findOneAndUpdate({_id: req.params.id}, {$set: req.body}).populate("serviceInfo");
+        console.log(productTna)
+        await saveNotification({
+            userId: productTna.requestedUser,
+            loggedInUser: req.loggedInUser,
+            userType: "ADMIN",
+            data: {
+                entity: "TNA",
+                title: `TNA sheet is update for service ${productTna?.serviceInfo.serviceType.label}`,
+                createdAt: productTna.updatedAt,
+                entityId: productTna._id
+            }
+        })
         res.status(200).json({
             message: "Save successful!",
             data: productTna

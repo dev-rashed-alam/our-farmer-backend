@@ -1,7 +1,7 @@
 const {setCommonError} = require("../middlewares/common/errorHandler");
 const CatalogService = require("../models/CatalogService");
 const {parseDate} = require("../utilities/helper");
-const {saveNotification} = require("./notificationController");
+const {saveNotification, deleteNotifications} = require("./notificationController");
 
 const saveServiceInfo = async (req) => {
     const newService = new CatalogService({
@@ -125,6 +125,17 @@ const changeCatalogServiceStatus = async (req, res, next) => {
     try {
         await CatalogService.findOneAndUpdate({_id: req.params.id}, {$set: {status: req.params.status}});
         const catalogService = await CatalogService.findOne({_id: req.params.id}).populate("productCatalog").populate("createdBy");
+        await saveNotification({
+            userId: catalogService.createdBy,
+            loggedInUser: req.loggedInUser,
+            userType: "FARMER",
+            data: {
+                entity: "SERVICE",
+                title: `Your Service of ${catalogService.serviceType.label} for ${catalogService.productCatalog.productTitle} is  ${catalogService.status === "APPROVE" ? "Approved" : "Rejected"}`,
+                createdAt: catalogService.createdAt,
+                entityId: catalogService._id
+            }
+        })
         res.status(200).json({
             message: "Successful!",
             data: catalogService
@@ -147,9 +158,10 @@ const removeCatalogService = async (req, res, next) => {
                 entity: "SERVICE",
                 title: `Your Service of ${catalogService.serviceType.label} for ${catalogService.productCatalog.productTitle} is deleted`,
                 createdAt: catalogService.createdAt,
-                entityId: catalogService._id
+                entityId: null
             }
         })
+        await deleteNotifications(catalogService._id, "SERVICE")
         res.status(200).json({
             message: "successful",
         });

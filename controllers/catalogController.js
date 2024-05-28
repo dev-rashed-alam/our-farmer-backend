@@ -4,7 +4,7 @@ const {ProductCatalog, ProductCategory} = require("../models/ProductCatalog");
 const {productStages, parseDate} = require("../utilities/helper");
 const createError = require("http-errors");
 const User = require("../models/User")
-const {saveNotification} = require("./notificationController");
+const {saveNotification, deleteNotifications} = require("./notificationController");
 
 const saveAreaInfo = async (req) => {
     const area = new AreaInfo({
@@ -211,7 +211,7 @@ const removeCatalog = async (req, res, next) => {
                 entityId: null
             }
         })
-
+        await deleteNotifications(productCatalog._id, "CATALOG")
         res.status(200).json({
             message: "successful",
         });
