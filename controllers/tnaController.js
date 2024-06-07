@@ -1,21 +1,18 @@
 const {setCommonError} = require("../middlewares/common/errorHandler");
 const {ProductPhase, PhaseActivity, ProductTna} = require("../models/ProductTNA");
-const {saveNotification} = require("./notificationController");
+const {saveNotification, deleteNotifications} = require("./notificationController");
 
 
 const saveTnaMasterData = async (req, res, next) => {
     try {
         const newPhase = new ProductPhase({
-            title: req.body.title,
-            createdBy: req.loggedInUser.id
+            title: req.body.title, createdBy: req.loggedInUser.id
         })
         await newPhase.save();
 
         const activityPromises = req.body.activityList?.map(async (item) => {
             const activity = new PhaseActivity({
-                name: item,
-                phase: newPhase.id,
-                createdBy: req.loggedInUser.id
+                name: item, phase: newPhase.id, createdBy: req.loggedInUser.id
             })
             await activity.save()
         })
@@ -33,8 +30,7 @@ const getTnaMasterData = async (req, res, next) => {
     try {
         const activityList = await PhaseActivity.find().populate("Product_Phase");
         res.status(200).json({
-            message: "Save successful!",
-            data: activityList
+            message: "Save successful!", data: activityList
         })
     } catch (error) {
         console.log(error)
@@ -68,14 +64,12 @@ const getProductTnaByUser = async (req, res, next) => {
     try {
         let filterQuery = req.loggedInUser.userType === "FARMER" ? {requestedUser: req.loggedInUser.id} : {}
         const productTna = await ProductTna.find(filterQuery).populate({
-            path: 'serviceInfo',
-            populate: {
+            path: 'serviceInfo', populate: {
                 path: 'productCatalog'
             }
         });
         res.status(200).json({
-            message: "Save successful!",
-            data: productTna
+            message: "Save successful!", data: productTna
         })
     } catch (error) {
         console.log(error)
@@ -90,14 +84,12 @@ const getProductTnaById = async (req, res, next) => {
             .populate('createdBy')
             .populate('requestedUser')
             .populate({
-                path: "activity",
-                populate: {
+                path: "activity", populate: {
                     path: "phase"
                 }
             })
         res.status(200).json({
-            message: "Save successful!",
-            data: productTna
+            message: "Save successful!", data: productTna
         })
     } catch (error) {
         console.log(error)
@@ -108,12 +100,8 @@ const getProductTnaById = async (req, res, next) => {
 const updateProductTna = async (req, res, next) => {
     try {
         const productTna = await ProductTna.findOneAndUpdate({_id: req.params.id}, {$set: req.body}).populate("serviceInfo");
-        console.log(productTna)
         await saveNotification({
-            userId: productTna.requestedUser,
-            loggedInUser: req.loggedInUser,
-            userType: "ADMIN",
-            data: {
+            userId: productTna.requestedUser, loggedInUser: req.loggedInUser, userType: "ADMIN", data: {
                 entity: "TNA",
                 title: `TNA sheet is update for service ${productTna?.serviceInfo.serviceType.label}`,
                 createdAt: productTna.updatedAt,
@@ -121,9 +109,20 @@ const updateProductTna = async (req, res, next) => {
             }
         })
         res.status(200).json({
-            message: "Save successful!",
-            data: productTna
+            message: "Save successful!", data: productTna
         })
+    } catch (error) {
+        setCommonError(error)
+    }
+}
+
+const removeBulkTna = async (serviceId) => {
+    try {
+        const tnaList = await ProductTna.find({serviceInfo: serviceId})
+        await ProductTna.deleteMany({serviceInfo: serviceId});
+        for (const doc of tnaList) {
+            await deleteNotifications(doc._id, "TNA");
+        }
     } catch (error) {
         setCommonError(error)
     }
@@ -135,5 +134,6 @@ module.exports = {
     saveProductTna,
     getProductTnaById,
     getProductTnaByUser,
-    updateProductTna
+    updateProductTna,
+    removeBulkTna
 }

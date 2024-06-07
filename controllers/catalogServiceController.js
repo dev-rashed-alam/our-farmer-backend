@@ -2,6 +2,8 @@ const {setCommonError} = require("../middlewares/common/errorHandler");
 const CatalogService = require("../models/CatalogService");
 const {parseDate} = require("../utilities/helper");
 const {saveNotification, deleteNotifications} = require("./notificationController");
+const {removeBulkTna} = require("./tnaController");
+const {ProductTna} = require("../models/ProductTNA");
 
 const saveServiceInfo = async (req) => {
     const newService = new CatalogService({
@@ -162,11 +164,27 @@ const removeCatalogService = async (req, res, next) => {
             }
         })
         await deleteNotifications(catalogService._id, "SERVICE")
+        await removeBulkTna(catalogService._id)
         res.status(200).json({
             message: "successful",
         });
     } catch (error) {
         console.log(error)
+        setCommonError(error)
+    }
+}
+
+const removeBulkCatalogService = async (catalogId) => {
+    try {
+        const serviceList = await CatalogService.find({productCatalog: catalogId})
+        await CatalogService.deleteMany({productCatalog: catalogId});
+        if (serviceList.length > 0) {
+            for (const doc of serviceList) {
+                await deleteNotifications(doc._id, "SERVICE")
+                await removeBulkTna(doc._id)
+            }
+        }
+    } catch (error) {
         setCommonError(error)
     }
 }
@@ -179,5 +197,6 @@ module.exports = {
     getAllCatalogService,
     updateCatalogService,
     saveCatalogService,
-    getCatalogServiceByStatus
+    getCatalogServiceByStatus,
+    removeBulkCatalogService
 }
