@@ -22,7 +22,7 @@ const getSummary = async (req, res, next) => {
         let marginPercentage = (margin / revenue) * 100
         res.status(200).json({
             message: "Successful!",
-            date: {
+            data: {
                 farmerCount,
                 catalogCount,
                 catalogServiceCount,
@@ -36,6 +36,63 @@ const getSummary = async (req, res, next) => {
     }
 }
 
+const getOrderSummary = async (req, res, next) => {
+    try {
+        const report = await Order.aggregate([
+            {
+                $group: {
+                    _id: {
+                        year: {$year: '$createdAt'},
+                        month: {$month: '$createdAt'},
+                        status: '$isDelivered'
+                    },
+                    count: {$sum: 1}
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        year: '$_id.year',
+                        month: '$_id.month'
+                    },
+                    statuses: {
+                        $push: {
+                            status: '$_id.status',
+                            count: '$count'
+                        }
+                    }
+                }
+            },
+            {
+                $project: {
+                    year: '$_id.year',
+                    month: '$_id.month',
+                    statuses: {
+                        $arrayToObject: {
+                            $map: {
+                                input: '$statuses',
+                                as: 'statusCount',
+                                in: {k: '$$statusCount.status', v: '$$statusCount.count'}
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                $sort: {'year': 1, 'month': 1}
+            }
+        ]);
+        res.status(200).json({
+            message: "Successful!",
+            data: report
+        })
+    } catch (e) {
+        console.log(e)
+        setCommonError(e)
+    }
+}
+
 module.exports = {
-    getSummary
+    getSummary,
+    getOrderSummary
 }
