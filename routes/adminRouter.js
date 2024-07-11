@@ -14,6 +14,7 @@ const authMiddleware = require("../middlewares/common/authMiddleware");
 const {saveTnaMasterData,getTnaMasterData, saveProductTna} = require("../controllers/tnaController");
 const {createProductValidation} = require("../middlewares/product/productValidator");
 const {getOrders, updateOrderStatus, getSingleOrder} = require("../controllers/orderController");
+const productUpload = require("../middlewares/product/productUpload");
 const router = express.Router();
 
 router.get("/users", authMiddleware, findAllUsers)
@@ -35,7 +36,7 @@ router.post("/tna/save", authMiddleware, saveProductTna)
 
 //product
 router.get("/products", getAllProducts)
-router.post("/products", createProductValidation, validationHandler, createProduct)
+router.post("/products", productUpload, createProductValidation, validationHandler, createProduct)
 router.put("/product/:id", validationHandler, updateProduct)
 
 //orders

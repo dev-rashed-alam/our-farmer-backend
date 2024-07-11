@@ -15,11 +15,16 @@ const getAllProducts = async (req, res, next) => {
 
 const createProduct = async (req, res, next) => {
     try {
-        const product = new Product({...req.body})
-        product.slug = req.body.name.toLowerCase().split(' ').join('-');
+        const postData = req.body
+        if (req?.files?.[0]?.filename) {
+            const productLocation = process.env.APP_URL + "uploads/products/";
+            postData.image = productLocation + req.files[0].filename;
+        }
+
+        let slug = req.body.name.toLowerCase().split(' ').join('-');
         let data = new Product({
-            ...req.body,
-            slug: product.slug
+            ...postData,
+            slug: slug
         });
         await data.save();
         res.status(200).json({
@@ -27,6 +32,7 @@ const createProduct = async (req, res, next) => {
             data
         })
     } catch (error) {
+        console.log(error)
         setCommonError(error)
     }
 }
